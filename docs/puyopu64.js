@@ -2,7 +2,7 @@
   'use strict';
 
   const CHAR_PPPP =
-    'ABCDEFGHJKLMNPQRSTUVWXYZadefghijmnrty0123456789!#$%&*+-/=><?@\\^~';
+    'ABCDEFGHJKLMNPQRSTUVWXYZadefghijmnrty0123456789!#$%&*+-/=<>?@\\^~';
   const CHAR_PP7 =
     'あいうえおかきくけこさしすせそたちつてとなにのはひふへほまみむも' +
     'やゆよらりるろをＡＢＣＤＥＦＧＨＩＪＫＬＭＮＰＲＳＴＵＶＷＸＹＺ';
