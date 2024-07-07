@@ -36,6 +36,10 @@
     return instance;
   }, {}));
 
+  // パスワードのパースエラー
+  function Puyopu64Error() {}
+  Puyopu64Error.prototype = RangeError;
+
   /**
     * パスワードやセクステットの操作を担うクラス
     *
@@ -87,14 +91,7 @@
       * 指定されたセクステットのフォーマットを取得
       */
     getFormat(sextetSequence) {
-      switch(sextetSequence[sextetSequence.length - 1]) {
-        case 0:
-          return Format.PLAIN;
-        case 2:
-          return Format.RLE;
-        default:
-          throw new RangeError('Invalid format.');
-      }
+      return sextetSequence[sextetSequence.length - 1];
     }
 
     /**
@@ -135,6 +132,18 @@
           throw new RangeError('Cannot recognize the original rule.');
       }
     }
+
+    /**
+      * 指定されたDOM要素にセクステットの内容に関するコメントを反映する
+      *
+      * 文言はもちろん、CSSクラスもいじる場合があります。
+      */
+    updateCommentForSextetSequence(element, sextetSequence) {
+      // デフォルトでは中身を空にするだけ
+      while (element.firstChild) {
+        element.removeChild(element.lastChild);
+      }
+    }
   }
 
   const Puyo20thPassword = new class extends Puyopu64 {
@@ -150,6 +159,13 @@
           String.fromCharCode(ch.charCodeAt(0) + 0xFEE0))
         .replace(/[ａ-ｎｐｒ-ｚ]/g, ch =>
           String.fromCharCode(ch.charCodeAt(0) - 0x20));
+    }
+
+    encode(sextetSequence) {
+      // ホワイトスペースと改行を適当に入れる
+      return super.encode(sextetSequence)
+        .replace(/.{4}/g, '$& ')
+        .replace(/(.{14}) /g, "$1\n");
     }
 
     /**
@@ -283,4 +299,68 @@
       const sextet = CHAR_PP7.indexOf(ch);
     }
   }
+
+  // 入力に応じて変換前と変換後のバージョンを推測する
+  document.getElementById('originalPassword').addEventListener('input', e => {
+    const sourceTextNode = document.getElementById('originalVersion');
+    const targetTextNode = document.getElementById('anotherVersion');
+    try {
+      const decoder = getPasswordDecoder(e.target.value);
+      if (!decoder) {
+        throw new RangeError();
+      }
+      const sextet = decoder.decode(e.target.value);
+      const rule = decoder.getRuleFromCellCount(sextet);
+      if (decoder === Puyo20thPassword) {
+        if (rule == Rule.SUN) {
+          sourceTextNode.textContent = 'ぷよぷよ！！';
+        } else {
+          sourceTextNode.textContent = 'ぷよぷよ７、ぷよぷよ！！';
+        }
+        targetTextNode.textContent = 'ぷよぷよパズルポップ';
+      } else if (decoder === PpppPassword) {
+        sourceTextNode.textContent = 'ぷよぷよパズルポップ';
+        if (rule == Rule.SUN) {
+          targetTextNode.textContent = 'ぷよぷよ！！';
+        } else {
+          targetTextNode.textContent = 'ぷよぷよ７、ぷよぷよ！！';
+        }
+      } else {
+        throw new RangeError();
+      }
+    } catch (e) {
+      if (!(e instanceof RangeError)) {
+        throw e;
+      }
+      sourceTextNode.textContent = '元';
+      targetTextNode.textContent = '翻訳後';
+    }
+  });
+
+  // 翻訳ボタンが押されたら変換する
+  function transpilePassword(password) {
+    const resultNode = document.getElementById('anotherPassword');
+    try {
+      const Decoder = getPasswordDecoder(password);
+      const Encoder =
+        Decoder === Puyo20thPassword ? PpppPassword : (
+        Decoder === PpppPassword ? Puyo20thPassword :
+        null);
+      if (Encoder === null) {
+        throw new RangeError('パスワードが まちがっているようです。');
+      }
+
+      const sextet = Decoder.decode(password);
+      resultNode.value = Encoder.encode(sextet);
+    } catch (e) {
+      if (!(e instanceof RangeError)) {
+        console.error(e);
+      }
+      resultNode.value = "エラー:\n" + e.message;
+    }
+  }
+  document.getElementById('puyopu64').addEventListener('submit', e => {
+    e.preventDefault();
+    transpilePassword(e.target.originalPassword.value);
+  });
 //})();
