@@ -87,7 +87,7 @@
       * 指定されたセクステットのフォーマットを取得
       */
     getFormat(sextetSequence) {
-      switch(sextetSequence(sextetSequence.length - 1)) {
+      switch(sextetSequence[sextetSequence.length - 1]) {
         case 0:
           return Format.PLAIN;
         case 2:
@@ -136,6 +136,7 @@
       }
     }
   }
+
   const Puyo20thPassword = new class extends Puyopu64 {
     static passwordChar = CHAR_PP7;
 
@@ -149,6 +150,74 @@
           String.fromCharCode(ch.charCodeAt(0) + 0xFEE0))
         .replace(/[ａ-ｎｐｒ-ｚ]/g, ch =>
           String.fromCharCode(ch.charCodeAt(0) - 0x20));
+    }
+
+    /**
+      * セクステット列の正規化（ぷよ７のRLEに使う）
+      */
+    normalizeSextetSequence(sextetSequence) {
+      // ぷよポップのパスワードは、RLEの方が短い場合でも
+      // たまにプレーンで吐き出すことがある。
+      // 一方ぷよ７は再エンコしたときに元のパスワードに戻らなきゃいけない。
+      // RLEにした場合の長さが〜とか65セクステット以上の繰り返しが〜とか
+      // ひとつずつ解決するのはまどろっこしいので、
+      // 一旦プレーンに戻してからぷよ７のやり方でRLEし直す(!)
+      let plainSequence;
+
+      try {
+        switch (this.getFormat(sextetSequence)) {
+          case Format.PLAIN:
+            plainSequence = sextetSequence;
+            break;
+          case Format.RLE:
+            plainSequence = [];
+            for (let i = 0; i < sextetSequence.length - 2; ++i) {
+              const cell = sextetSequence[i];
+              for (let runLength = sextetSequence[++i] + 1; runLength--;) {
+                plainSequence.push(cell);
+              }
+            }
+            plainSequence.push(Format.PLAIN);
+            break;
+          default:
+            return sextetSequence;
+        }
+      } catch(e) {
+        if (e instanceof RangeError) {
+          // よくわからないフォーマットの時は正規化しない
+          return sextetSequence;
+        }
+        throw e;
+      }
+
+      // そしてRLEにしながら文字数を測る
+      const rleSequence = [];
+      let previousSextet = -1;
+      let count;
+      for (const sextet of plainSequence.slice(0, -1)) {
+        if (sextet == previousSextet && count < 64) {
+          ++count;
+          continue;
+        }
+        if (previousSextet != -1) {
+          // RLEで長さがプレーン以下にならなさそうならプレーンを返す
+          // (最後にもう1ワード&フォーマット指定子を挿入するので長めに見積もる)
+          if (rleSequence.length + 5 > plainSequence.length) {
+            return plainSequence;
+          }
+          rleSequence.push(previousSextet);
+          rleSequence.push(count - 1);
+        }
+        previousSextet = sextet;
+        count = 1;
+      }
+      // 最後にもう1ワード入れる
+      rleSequence.push(previousSextet);
+      rleSequence.push(count - 1);
+      // そしてフォーマット指定子を入れたら完成
+      rleSequence.push(Format.RLE);
+      // 最後までプレーン以下の長さを保持しながら処理できたらRLE版を返す
+      return rleSequence;
     }
   }();
 
