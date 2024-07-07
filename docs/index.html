@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>れんしゅうノート パスワード翻訳</title>
+    <meta name="viewport" content="width=device-width">
+    <style>
+      h1 {
+        text-align: center;
+      }
+      form#puyopu64 {
+        text-align: center;
+      }
+      form#puyopu64 label {
+        display: block;
+        margin: 0 auto;
+      }
+      form#puyopu64 textarea {
+        display: block;
+        margin: 0 auto;
+        width: 100%;
+        height: 6em;
+      }
+      form#puyopu64 input[type=submit] {
+        font-size: 24px;
+      }
+      em {
+        margin-right: 0.25em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>
+      れんしゅうノート<br>
+      パスワード翻訳
+    </h1>
+    <p>
+      ぷよぷよ7、ぷよぷよ！！、ぷよぷよパズルポップのパスワードを相互に変換します。
+    </p>
+    <form id="puyopu64">
+      <label>
+        <span id="originalVersion">元</span>のパスワード
+        <textarea id="originalPassword"></textarea>
+      </label>
+      <div>&darr;</div>
+      <input id="execute" type="submit" value="ほんやくする！">
+      <div>&darr;</div>
+      <label>
+        <span id="anotherVersion">翻訳後</span>のパスワード
+        <textarea id="anotherPassword" readonly></textarea>
+      </label>
+      <div id="anotherComment"></div>
+    </form>
+    <script type="text/javascript" src="puyopu64.js"></script>
+  </body>
+</html>
