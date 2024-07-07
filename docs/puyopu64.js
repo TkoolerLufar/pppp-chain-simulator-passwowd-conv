@@ -1,4 +1,4 @@
-//(function() {
+(function() {
   'use strict';
 
   const CHAR_PPPP =
@@ -363,4 +363,4 @@
     e.preventDefault();
     transpilePassword(e.target.originalPassword.value);
   });
-//})();
+})();
