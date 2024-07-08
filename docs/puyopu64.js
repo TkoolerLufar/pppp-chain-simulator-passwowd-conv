@@ -354,7 +354,31 @@
       }
 
       const sextet = Decoder.decode(password);
-      resultNode.value = Encoder.encode(sextet);
+      const result = Encoder.encode(sextet);
+      resultNode.value = result;
+
+      // 二次元コード表示欄をリセット
+      const qrNode = document.getElementById('ppppCodeImageArea');
+      const qrCredit = document.getElementById('qrCredit');
+      while (qrNode.firstChild) {
+        qrNode.removeChild(qrNode.lastChild);
+        qrCredit.style.display = 'none';
+      }
+      if (Encoder === PpppPassword) {
+        // ぷよポップパスワードへの変換時はQRコードも表示する
+        qrNode.appendChild(document.createTextNode('QRコード'));
+
+        const qr = qrcode(5, 'M');
+        qr.addData(result);
+        qr.make();
+        const cellSize = 8
+        const margin = 16;
+        const img = document.createElement('img');
+        img.src = qr.createDataURL(cellSize, margin);
+        img.alt = result;
+        qrNode.appendChild(img);
+        qrCredit.style.display = 'block';
+      }
     } catch (e) {
       if (!(e instanceof RangeError)) {
         console.error(e);

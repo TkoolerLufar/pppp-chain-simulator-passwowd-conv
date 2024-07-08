@@ -24,6 +24,23 @@
       form#puyopu64 input[type=submit] {
         font-size: 24px;
       }
+      #ppppCodeImageArea {
+        padding: 8px;
+        text-align: center;
+      }
+      #ppppCodeImageArea img {
+        display: block;
+        margin: 0 auto;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1;
+        image-rendering: pixelated;
+      }
+      #qrCredit {
+        display: none;
+        font-size: 10px;
+        text-align: center;
+      }
       em {
         margin-right: 0.25em;
       }
@@ -51,6 +68,11 @@
       </label>
       <div id="anotherComment"></div>
     </form>
+    <div id="ppppCodeImageArea"></div>
+    <div id="qrCredit">
+      QRコードは株式会社デンソーウェーブの登録商標です。
+    </div>
+    <script type="text/javascript" src="qrcode.js"></script>
     <script type="text/javascript" src="puyopu64.js"></script>
   </body>
 </html>
