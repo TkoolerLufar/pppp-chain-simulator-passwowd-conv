@@ -311,29 +311,32 @@
       }
       const sextet = decoder.decode(e.target.value);
       const rule = decoder.getRuleFromCellCount(sextet);
+      let sourceText, targetText;
       if (decoder === Puyo20thPassword) {
         if (rule == Rule.SUN) {
-          sourceTextNode.textContent = 'ぷよぷよ！！';
+          sourceText = 'ぷよぷよ！！';
         } else {
-          sourceTextNode.textContent = 'ぷよぷよ７、ぷよぷよ！！';
+          sourceText = 'ぷよぷよ７、ぷよぷよ！！';
         }
-        targetTextNode.textContent = 'ぷよぷよパズルポップ';
+        targetText = 'ぷよぷよパズルポップ';
       } else if (decoder === PpppPassword) {
-        sourceTextNode.textContent = 'ぷよぷよパズルポップ';
+        sourceText = 'ぷよぷよパズルポップ';
         if (rule == Rule.SUN) {
-          targetTextNode.textContent = 'ぷよぷよ！！';
+          targetText = 'ぷよぷよ！！';
         } else {
-          targetTextNode.textContent = 'ぷよぷよ７、ぷよぷよ！！';
+          targetText = 'ぷよぷよ７、ぷよぷよ！！';
         }
       } else {
         throw new RangeError();
       }
+      sourceTextNode.textContent = sourceText + 'の';
+      targetTextNode.textContent = targetText + 'の';
     } catch (e) {
       if (!(e instanceof RangeError)) {
         throw e;
       }
-      sourceTextNode.textContent = '元';
-      targetTextNode.textContent = '翻訳後';
+      sourceTextNode.textContent = '元の';
+      targetTextNode.textContent = '翻訳後の';
     }
   });
 
