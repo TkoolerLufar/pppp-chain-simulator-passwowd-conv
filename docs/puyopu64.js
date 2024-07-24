@@ -249,10 +249,25 @@
       // ついでに波ダッシュも半角チルダに変換します。
       return password
         .replace(
-          /[！＃-＆＊＋－／-９＜-ＨＪ-ＮＰ-Ｚ＼＾ａｄ-ｊｍｎｒｔｙ\uff5e]/g,
+          /[！＃-＆＊＋－／-９＜-Ｚ＼＾-ｚ\uff5e]/g,
           ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)
         )
-        .replaceAll("\u301C", '~');
+        .replaceAll("\u301C", '~')
+        // 誤植の疑いが強い不使用文字をそれらしい文字に置換します。
+        .replaceAll('c', 'C')
+        .replaceAll('k', 'K')
+        .replaceAll('p', 'P')
+        .replaceAll('s', 'S')
+        .replaceAll('u', 'U')
+        .replaceAll('v', 'V')
+        .replaceAll('w', 'W')
+        .replaceAll('x', 'X')
+        .replaceAll('z', 'Z')
+        .replace(/[Oo]/g, '0')
+        .replace(/[Il|]/g, '1')
+        .replaceAll('b', '6')
+        .replaceAll('q', '9')
+        .replaceAll('_', '-');
     }
   }();
 
